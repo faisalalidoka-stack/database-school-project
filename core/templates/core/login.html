@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block title %}System Login - Lwabaswa School{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 70vh; padding: 20px;">
+    <div class="card-action" style="max-width: 450px; width: 100%; border-top: 5px solid #3b82f6; border-radius: 12px; box-sizing: border-box;">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h3 style="margin: 0 0 5px 0; color: #0f172a; font-weight: 800;">Staff Portal Sign In</h3>
+            <small style="color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Lwabaswa Primary School</small>
+        </div>
+        
+        {% if error %}
+            <div style="background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; font-weight: 600;">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/login/">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Username</label>
+                <input type="text" name="username" placeholder="e.g., dos, bursar, or admin" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem;" required autofocus>
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Password</label>
+                <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem;" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);">Secure System Entry</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 25px; color: #94a3b8; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+            🔒 AUTHORIZED PERSONNEL ONLY
+        </div>
+    </div>
+</div>
+{% endblock %}

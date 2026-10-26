@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="banner" style="border-left-color: #10b981; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h2>✍️ Register New Student</h2>
+        <div class="text-muted">Admit a new learner into the school management database ledger.</div>
+    </div>
+    <a href="/students/" class="btn btn-dark" style="background: #64748b;">⬅️ Back to Registry</a>
+</div>
+
+{% if error %}
+    <div style="background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+        ⚠️ {{ error }}
+    </div>
+{% endif %}
+
+<div class="card-action" style="max-width: 600px; margin: 0 auto;">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Admission Number</label>
+            <input type="text" name="admission_no" placeholder="e.g., LWA/2026/022" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" required>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Full Name</label>
+            <input type="text" name="full_name" placeholder="e.g., Okello John" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" required>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Gender</label>
+            <select name="gender" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" required>
+                <option value="">-- Select Gender --</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+            </select>
+        </div>
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Assigned Class stream</label>
+            <select name="class_id" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" required>
+                <option value="">-- Select Stream --</option>
+                {% for cls in classes %}
+                    <option value="{{ cls.0 }}">{{ cls.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; cursor: pointer;">Confirm System Admission</button>
+    </form>
+</div>
+{% endblock %}
+

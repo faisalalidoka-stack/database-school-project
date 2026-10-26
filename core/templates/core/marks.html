@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="banner" style="border-left-color: #f59e0b; display: flex; justify-content: space-between; align-items: center;">
+    <div><h2>✍️ Enter Academic Marks</h2><div class="text-muted">Record student examination scores directly to the central directory.</div></div>
+    <a href="/dashboard/" class="btn btn-dark" style="background: #64748b;">⬅️ Dashboard</a>
+</div>
+{% if error %}<div style="background:#fee2e2; border-left:4px solid #ef4444; color:#991b1b; padding:15px; border-radius:8px; margin-bottom:20px;">⚠️ {{ error }}</div>{% endif %}
+{% if success %}<div style="background:#d1fae5; border-left:4px solid #10b981; color:#065f46; padding:15px; border-radius:8px; margin-bottom:20px;">✅ {{ success }}</div>{% endif %}
+<div class="card-action" style="max-width: 500px; margin: 0 auto;">
+    <form method="POST">{% csrf_token %}
+        <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Select Student</label>
+            <select name="student_id" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required><option value="">-- Choose Student --</option>{% for s in students %}<option value="{{ s.0 }}">{{ s.1 }}</option>{% endfor %}</select></div>
+        <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Select Subject</label>
+            <select name="subject_id" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required><option value="">-- Choose Subject --</option>{% for sb in subjects %}<option value="{{ sb.0 }}">{{ sb.1 }}</option>{% endfor %}</select></div>
+        <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Select Term</label>
+            <select name="term_id" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required><option value="">-- Choose Term --</option>{% for t in terms %}<option value="{{ t.0 }}">{{ t.1 }}</option>{% endfor %}</select></div>
+        <div style="margin-bottom:20px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Score (Out of 100)</label>
+            <input type="number" name="score" min="0" max="150" placeholder="e.g., 85" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required></div>
+        <button type="submit" class="btn btn-warning" style="width:100%; padding:12px; font-size:1rem; cursor:pointer;">Post Academic Score</button>
+    </form>
+</div>
+{% endblock %}

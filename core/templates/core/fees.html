@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="banner" style="border-left-color: #10b981; display: flex; justify-content: space-between; align-items: center;">
+    <div><h2>💰 Process Fee Payments</h2><div class="text-muted">Bursar Ledger: Collect tuition and log financial receipts.</div></div>
+    <a href="/dashboard/" class="btn btn-dark" style="background: #64748b;">⬅️ Dashboard</a>
+</div>
+{% if error %}<div style="background:#fee2e2; border-left:4px solid #ef4444; color:#991b1b; padding:15px; border-radius:8px; margin-bottom:20px;">⚠️ {{ error }}</div>{% endif %}
+{% if success %}<div style="background:#d1fae5; border-left:4px solid #10b981; color:#065f46; padding:15px; border-radius:8px; margin-bottom:20px;">✅ {{ success }}</div>{% endif %}
+<div style="display:flex; gap:30px; flex-wrap:wrap;">
+    <div class="card-action" style="flex:1; min-width:320px;">
+        <form method="POST">{% csrf_token %}
+            <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Student</label>
+                <select name="student_id" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required><option value="">-- Select Payer --</option>{% for s in students %}<option value="{{ s.0 }}">{{ s.1 }}</option>{% endfor %}</select></div>
+            <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Term Allocation</label>
+                <select name="term_id" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required><option value="">-- Select Term --</option>{% for t in terms %}<option value="{{ t.0 }}">{{ t.1 }}</option>{% endfor %}</select></div>
+            <div style="margin-bottom:15px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Amount Paid (UGX)</label>
+                <input type="number" name="amount" placeholder="e.g., 200000" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required></div>
+            <div style="margin-bottom:20px;"><label style="display:block; font-weight:600; margin-bottom:5px;">Receipt Slotted No</label>
+                <input type="text" name="receipt_no" placeholder="e.g., RCP-9999" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" required></div>
+            <button type="submit" class="btn" style="background:#10b981; color:white; width:100%; padding:12px; font-size:1rem; cursor:pointer;">Secure Financial Post</button>
+        </form>
+    </div>
+    <div class="card-action" style="flex:1; min-width:320px; background:#f8fafc;">
+        <h5 style="margin-top:0;">📋 Recent System Transactions (Top 5)</h5>
+        <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <thead><tr style="border-bottom:2px solid #cbd5e1;"><th style="padding:8px;">Receipt</th><th style="padding:8px;">Student</th><th style="padding:8px; text-align:right;">Amount</th></tr></thead>
+            <tbody>{% for h in history %}<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:8px; font-weight:bold; font-family:monospace;">{{ h.0 }}</td><td style="padding:8px;">{{ h.1 }}</td><td style="padding:8px; text-align:right; font-weight:bold; color:#16a34a;">UGX {{ h.2|floatformat:0 }}</td></tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

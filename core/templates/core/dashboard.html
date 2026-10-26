@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="banner">
+    <h2>Welcome back, {{ request.session.full_name }}</h2>
+    <div>System Portal: <span class="badge">Live & Connected to MySQL</span></div>
+</div>
+
+<!-- Class Teacher Assignment Notification Banner -->
+{% if request.session.role == 'class_teacher' and teacher_class %}
+<div class="banner" style="border-left-color: #0ea5e9; background: #f0f9ff; margin-bottom: 25px;">
+    <h4 style="margin: 0 0 5px 0; color: #0369a1; font-weight: 700;">🏫 Assigned Homeroom: Class {{ teacher_class.name }}</h4>
+    <p style="margin: 0; color: #0c4a6e; font-size: 0.95rem;">You are managing the active grading registry and enrollment stream ledger for primary section <strong>Stream {{ teacher_class.name }}</strong>.</p>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Display personalized class metric for teachers, or total metrics for admins/management -->
+    {% if request.session.role == 'class_teacher' and stats.my_class_students %}
+    <div class="col-md-3">
+        <div class="card" style="border-top-color: #0ea5e9;">
+            <small>My Class Enrollment</small>
+            <h3 style="color: #0ea5e9;">{{ stats.my_class_students.0 }}</h3>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-3">
+        <div class="card">
+            <small>Total Students</small>
+            <h3 style="color: #3b82f6;">{{ stats.total_students.0 }}</h3>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-3">
+        <div class="card card-info">
+            <small>Active Classes</small>
+            <h3 style="color: #0ea5e9;">{{ stats.total_classes.0 }}</h3>
+        </div>
+    </div>
+    
+    {% if stats.total_marks_recorded is not None %}
+    <div class="col-md-3">
+        <div class="card card-warning">
+            <small>Marks Records</small>
+            <h3 style="color: #f59e0b;">{{ stats.total_marks_recorded.0 }}</h3>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if stats.total_collected is not None %}
+    <div class="col-md-3">
+        <div class="card card-success">
+            <small>Total Collections</small>
+            <h3 style="color: #10b981;">UGX {{ stats.total_collected.0|floatformat:0 }}</h3>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="card-action">
+        <h5>🛠️ Available Management Actions</h5>
+        <div class="btn-group">
+            <!-- Access mapping for Class Teachers, DOS, and Admins -->
+            {% if request.session.role == 'class_teacher' or request.session.role == 'director_of_studies' or request.session.role == 'admin' %}
+                <a href="/students/" class="btn btn-primary">📋 Class Registries</a>
+                <a href="/marks/" class="btn btn-warning">✍️ Enter Academic Marks</a>
+            {% endif %}
+            
+            {% if request.session.role == 'director_of_studies' or request.session.role == 'admin' %}
+                <a href="#" class="btn btn-dark">📇 Generate Report Cards</a>
+            {% endif %}
+            
+            {% if request.session.role == 'bursar' or request.session.role == 'admin' %}
+                <a href="/fees/" class="btn btn-primary" style="background:#10b981; border-color:#10b981;">💰 Process Fee Payments</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
