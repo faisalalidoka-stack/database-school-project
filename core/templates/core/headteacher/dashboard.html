@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Headteacher Dashboard - Lwabaswa School{% endblock %}
+
+{% block content %}
+<style>
+    .ht-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .ht-table th { text-align: left; padding: 10px 12px; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e2e8f0; }
+    .ht-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+    .ht-table .num { text-align: right; }
+    .ht-section { margin-bottom: 30px; }
+</style>
+
+<div class="banner">
+    <h2>Headteacher Dashboard</h2>
+    <div>Welcome, {{ request.session.full_name }}</div>
+    <form method="get" action="/headteacher/" style="margin-top: 14px; display: flex; gap: 10px; align-items: center;">
+        <label class="form-label" style="margin: 0;">Term:</label>
+        <select name="term" class="form-control" style="width: auto;" onchange="this.form.submit()">
+            {% for t in data.terms %}
+                <option value="{{ t.id }}" {% if t.id == data.term.id %}selected{% endif %}>{{ t.label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-md-3"><div class="card"><small>Students</small><h3 style="color:#3b82f6;">{{ data.total_students }}</h3></div></div>
+    <div class="col-md-3"><div class="card card-info"><small>Classes</small><h3 style="color:#0ea5e9;">{{ data.total_classes }}</h3></div></div>
+    <div class="col-md-3"><div class="card card-warning"><small>Active Staff</small><h3 style="color:#f59e0b;">{{ data.total_staff }}</h3></div></div>
+    <div class="col-md-3"><div class="card card-success"><small>School Average</small><h3 style="color:#10b981;">{% if data.academics.school_average is not None %}{{ data.academics.school_average }}%{% else %}-{% endif %}</h3></div></div>
+</div>
+
+<div class="row">
+    <div class="col-md-3"><div class="card card-success"><small>Fees Collected</small><h3 style="color:#10b981; font-size:1.6rem;">UGX {{ data.fees.collected|floatformat:"0g" }}</h3></div></div>
+    <div class="col-md-3"><div class="card card-info"><small>Fees Expected</small><h3 style="color:#0ea5e9; font-size:1.6rem;">UGX {{ data.fees.expected|floatformat:"0g" }}</h3></div></div>
+    <div class="col-md-3"><div class="card card-warning"><small>Outstanding</small><h3 style="color:#f59e0b; font-size:1.6rem;">UGX {{ data.fees.outstanding|floatformat:"0g" }}</h3></div></div>
+    <div class="col-md-3"><div class="card"><small>Students With Balance</small><h3 style="color:#3b82f6;">{{ data.fees.students_with_balance }}</h3></div></div>
+</div>
+
+<div class="card-action ht-section">
+    <h5>💰 Fee Collection by Class ({{ data.fees.rate }}% collected)</h5>
+    <table class="ht-table">
+        <tr><th>Class</th><th class="num">Students</th><th class="num">Expected (UGX)</th><th class="num">Collected (UGX)</th><th class="num">Balance (UGX)</th><th class="num">Rate</th></tr>
+        {% for c in data.fees_by_class %}
+        <tr>
+            <td><strong>{{ c.class_name }}</strong></td>
+            <td class="num">{{ c.students }}</td>
+            <td class="num">{{ c.expected|floatformat:"0g" }}</td>
+            <td class="num">{{ c.collected|floatformat:"0g" }}</td>
+            <td class="num">{{ c.balance|floatformat:"0g" }}</td>
+            <td class="num">{{ c.rate }}%</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No fee data for this term.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card-action ht-section">
+    <h5>📊 Class Performance
+        {% if data.academics.best_class %}(Best: {{ data.academics.best_class }}{% if data.academics.weakest_class %}, Weakest: {{ data.academics.weakest_class }}{% endif %}){% endif %}
+    </h5>
+    <table class="ht-table">
+        <tr><th>Class</th><th class="num">Average Score</th></tr>
+        {% for c in data.class_performance %}
+        <tr><td><strong>{{ c.class_name }}</strong></td><td class="num">{{ c.average }}%</td></tr>
+        {% empty %}
+        <tr><td colspan="2">No report cards for this term.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

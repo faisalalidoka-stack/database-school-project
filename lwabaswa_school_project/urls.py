@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from core.views_headteacher import headteacher_dashboard_view
 from core.views import (
     login_view, logout_view, dashboard_view, 
     student_list_view, add_student_view, 
@@ -16,4 +17,5 @@ urlpatterns = [
     path('marks/', marks_entry_view, name='marks_entry'),     # New Marks Route
     path('fees/', fee_payments_view, name='fee_payments'),    # New Fees Route
     path('admin/', admin.site.urls),
+    path('headteacher/', headteacher_dashboard_view, name='headteacher_dashboard'),
 ]

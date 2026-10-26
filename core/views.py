@@ -29,6 +29,8 @@ def logout_view(request):
 def dashboard_view(request):
     if not request.session.get('user_id'):
         return redirect('/login/')
+    if request.session.get('role') == 'headteacher':
+        return redirect('/headteacher/')
         
     role = request.session.get('role')
     user_id = request.session.get('user_id')
