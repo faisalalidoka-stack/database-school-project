@@ -1,94 +1,98 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="row g-4 mb-4">
-    <!-- Student Count Summary Card -->
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
-            <div>
-                <h6 class="text-muted small uppercase mb-1">Total Enrolled Students</h6>
-                <h2 class="m-0 fw-bold">{{ total_students }}</h2>
-            </div>
-            <div class="bg-primary-subtle text-primary rounded p-3">
-                <i class="bi bi-mortarboard-fill fs-3"></i>
-            </div>
+<!-- Grid Component Styling Overrides -->
+<style>
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .metric-card { background: #ffffff; padding: 24px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+    .metric-details h6 { font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .metric-details h2 { font-size: 28px; font-weight: 700; color: #1e293b; }
+    .metric-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    
+    .content-splitter { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+    .data-table-card { background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+    .card-title { font-size: 16px; font-weight: 700; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+    
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    .custom-table th { padding: 12px; background: #f8fafc; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+    .custom-table td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    .custom-table tr:hover { background: #f8fafc; }
+    
+    .badge-tx { color: #16a34a; background: #f0fdf4; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 13px; }
+    .select-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #ffffff; outline: none; margin-top: 6px; font-size: 13px; }
+</style>
+
+<!-- 1. COUNTER CARDS SUMMARY ROWS -->
+<div class="metric-grid">
+    <div class="metric-card">
+        <div class="metric-details">
+            <h6>Total Enrolled Students</h6>
+            <h2>{{ total_students }}</h2>
         </div>
+        <div class="metric-icon" style="background: #eff6ff; color: #2563eb;">🎓</div>
     </div>
-    <!-- Active Streams Card -->
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
-            <div>
-                <h6 class="text-muted small uppercase mb-1">Active Class Streams</h6>
-                <h2 class="m-0 fw-bold">{{ total_classes }}</h2>
-            </div>
-            <div class="bg-success-subtle text-success rounded p-3">
-                <i class="bi bi-door-open-fill fs-3"></i>
-            </div>
+    
+    <div class="metric-card">
+        <div class="metric-details">
+            <h6>Active Class Streams</h6>
+            <h2>{{ total_classes }}</h2>
         </div>
+        <div class="metric-icon" style="background: #ecfdf5; color: #10b981;">🚪</div>
     </div>
-    <!-- Total Staff Card -->
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
-            <div>
-                <h6 class="text-muted small uppercase mb-1">Registered System Staff</h6>
-                <h2 class="m-0 fw-bold">{{ total_staff }}</h2>
-            </div>
-            <div class="bg-warning-subtle text-warning rounded p-3">
-                <i class="bi bi-person-badge-fill fs-3"></i>
-            </div>
+
+    <div class="metric-card">
+        <div class="metric-details">
+            <h6>Registered System Staff</h6>
+            <h2>{{ total_staff }}</h2>
         </div>
+        <div class="metric-icon" style="background: #fff7ed; color: #f97316;">💼</div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Transactions Audit Panel -->
-    <div class="col-md-8 mb-4">
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="text-dark border-bottom pb-2 mb-3">Recent Invoicing Transactions: {% if active_term %}{{ active_term.term_name }}{% else %}All terms{% endif %}</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+<!-- 2. DATA TABLE & FILTERS SECTION -->
+<div class="content-splitter">
+    <div class="data-table-card">
+        <div class="card-title">Recent Invoicing Transactions</div>
+        <div style="overflow-x: auto;">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Receipt No.</th>
+                        <th>Student</th>
+                        <th>Amount Collected</th>
+                        <th>Transaction Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in recent_transactions %}
                         <tr>
-                            <th>Receipt No.</th>
-                            <th>Student</th>
-                            <th>Amount Collected</th>
-                            <th>Transaction Date</th>
+                            <td style="font-family: monospace; font-weight: bold; color: #64748b;">#{{ tx.receipt_no }}</td>
+                            <td style="font-weight: 600;">{{ tx.student.full_name }}</td>
+                            <td><span class="badge-tx">UGX {{ tx.amount_paid }}</span></td>
+                            <td style="color: #94a3b8; font-size: 12px;">{{ tx.payment_date|date:"M d, Y H:i" }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for tx in recent_transactions %}
-                            <tr>
-                                <td class="font-monospace fw-bold">#{{ tx.receipt_no }}</td>
-                                <td>{{ tx.student.full_name }}</td>
-                                <td class="text-success fw-bold">UGX {{ tx.amount_paid }}</td>
-                                <td>{{ tx.payment_date|date:"M d, Y H:i" }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">No recent micro-payments tracked for this term.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #94a3b8; padding: 32px;">No finance collections found for this cycle selection.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Cycle Filter Controls -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-0 shadow-sm p-3">
-            <h5 class="text-dark border-bottom pb-2 mb-3">Academic Term Audits</h5>
-            <form method="GET" action="" class="mb-3">
-                <label class="form-label small text-muted">Filter Audit Metrics By Term:</label>
-                <select name="term" class="form-select mb-2" onchange="this.form.submit()">
-                    {% for t in terms %}
-                        <option value="{{ t.term_id }}" {% if t.term_id|slugify == request.GET.term %}selected{% endif %}>
-                            {{ t.term_name }} ({{ t.academic_year }})
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
-        </div>
+    <div class="data-table-card" style="height: fit-content;">
+        <div class="card-title">Academic Term Audits</div>
+        <form method="GET" action="">
+            <label style="font-size: 12px; font-weight: 600; color: #64748b;">Filter Metrics By Term Context:</label>
+            <select name="term" class="select-input" onchange="this.form.submit()">
+                {% for t in terms %}
+                    <option value="{{ t.term_id }}" {% if t.term_id|slugify == request.GET.term %}selected{% endif %}>
+                        {{ t.term_name }} ({{ t.academic_year }})
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
     </div>
 </div>
 {% endblock content %}

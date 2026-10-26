@@ -1,85 +1,85 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Log Sickbay Visit Form -->
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="text-dark border-bottom pb-2 mb-3">
-                <i class="bi bi-heart-pulse-fill text-danger me-2"></i>New Sickbay Admission
-            </h5>
-            <form method="POST" action="">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label small text-muted fw-bold">Patient Student</label>
-                    <select name="student" class="form-select" required>
-                        <option value="" disabled selected>Search patient name...</option>
-                        {% for std in students %}
-                            <option value="{{ std.student_id }}">{{ std.full_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label small text-muted fw-bold">Current Term</label>
-                    <select name="term" class="form-select" required>
-                        <option value="" disabled selected>Select term...</option>
-                        {% for term in terms %}
-                            <option value="{{ term.term_id }}">{{ term.term_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label small text-muted fw-bold">Observed Symptoms / Illness</label>
-                    <textarea name="symptoms" class="form-control" rows="3" placeholder="e.g. Complaining of severe headache and high body temperature." required></textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label small text-muted fw-bold">Treatment / Medication Administered</label>
-                    <textarea name="treatment_given" class="form-control" rows="3" placeholder="e.g. Administered 2 tabs of Paracetamol and assigned 2 hours bed rest." required></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-danger w-100 py-2">
-                    <i class="bi bi-plus-circle me-2"></i>Save Incident Card
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Active Treatment Logs Feed -->
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm p-4 h-100">
-            <h5 class="text-dark border-bottom pb-2 mb-3">
-                <i class="bi bi-journal-medical text-primary me-2"></i>Daily Sickbay Incident Logs
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Date / Time</th>
-                            <th>Student Patient</th>
-                            <th>Presented Symptoms</th>
-                            <th>Treatment Rendered</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for log in medical_records %}
-                            <tr>
-                                <td class="small text-muted font-monospace">{{ log.visit_date|date:"d M, H:i" }}</td>
-                                <td class="fw-bold text-dark">{{ log.student.full_name }}</td>
-                                <td class="small text-secondary">{{ log.symptoms }}</td>
-                                <td class="small"><span class="badge bg-success-subtle text-success border border-success-subtle">{{ log.treatment_given }}</span></td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted p-4">No sickbay incidents filed inside the database.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+    
+    <!-- Left Column: New Sickbay Admission Form -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+        <h5 class="text-slate-800 font-bold text-lg border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+            <i class="bi bi-heart-pulse-fill text-red-500"></i> New Sickbay Admission
+        </h5>
+        <form method="POST" action="" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Select Patient Student</label>
+                <select name="student" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" required>
+                    <option value="" disabled selected>Search roster...</option>
+                    {% for std in students %}
+                        <option value="{{ std.student_id }}">{{ std.full_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Current Term Cycle</label>
+                <select name="term" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" required>
+                    <option value="" disabled selected>Select session...</option>
+                    {% for term in terms %}
+                        <option value="{{ term.term_id }}">{{ term.term_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Observed Symptoms / Complaint</label>
+                <textarea name="symptoms" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none" rows="3" placeholder="Describe clinical symptoms..." required></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Treatment / Medication Administered</label>
+                <textarea name="treatment_given" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none" rows="3" placeholder="Detail the medical care given..." required></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-semibold text-sm transition-colors shadow-sm shadow-red-200 mt-2">
+                <i class="bi bi-plus-circle-fill me-2"></i>Commit Incident Log
+            </button>
+        </form>
+    </div>
+
+    <!-- Right Column: Medical History Logs Table -->
+    <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <h5 class="text-slate-800 font-bold text-lg p-6 border-b border-slate-100 flex items-center gap-2 mb-0">
+            <i class="bi bi-clock-history text-slate-400"></i> Active Medical Log Roster
+        </h5>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+                <thead>
+                    <tr class="bg-slate-50/70 border-b border-slate-100 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                        <th class="py-4 px-6">Timestamp</th>
+                        <th class="py-4 px-6">Patient Name</th>
+                        <th class="py-4 px-6">Clinical Breakdown</th>
+                        <th class="py-4 px-6">Prescription</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    {% for log in medical_records %}
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="py-4 px-6 font-mono text-xs text-slate-400 whitespace-nowrap">{{ log.visit_date|date:"d M, H:i" }}</td>
+                            <td class="py-4 px-6 font-semibold text-slate-800 whitespace-nowrap">{{ log.student.full_name }}</td>
+                            <td class="py-4 px-6 text-slate-500 max-w-xs truncate">{{ log.symptoms }}</td>
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                <span class="bg-emerald-50 text-emerald-700 font-medium px-2.5 py-1 rounded-lg border border-emerald-100 text-xs inline-block">{{ log.treatment_given }}</span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-slate-400 py-12 font-medium">No medical case files currently compiled.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+
 </div>
 {% endblock content %}

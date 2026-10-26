@@ -3,65 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title|default:"School Management System" }}</title>
-    <!-- Modern Bootstrap 5 Layout Interface -->
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <link rel="stylesheet" href="https://jsdelivr.net">
+    <title>{{ title|default:"E.M.S.T School Workspace" }}</title>
     <style>
-        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
-        .sidebar { background: #1e293b; color: #fff; min-width: 260px; max-width: 260px; min-height: 100vh; }
-        .sidebar a { color: #cbd5e1; text-decoration: none; padding: 12px 20px; display: block; transition: all 0.2s; }
-        .sidebar a:hover, .sidebar a.active { background: #334155; color: #fff; border-left: 4px solid #3b82f6; }
-        .navbar-brand-custom { font-size: 1.25rem; font-weight: bold; background: #0f172a; padding: 20px; text-align: center; }
+        /* Base Reset Layout */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f1f5f9; display: flex; min-height: 100vh; color: #334155; }
+        
+        /* 🏢 SIDEBAR COMPONENT (Deep Royal Blue Corporate theme) */
+        .app-sidebar { width: 260px; background: linear-gradient(180deg, #0a58ca 0%, #084fb6 100%); color: #ffffff; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 100; }
+        .sidebar-brand { padding: 24px; background-color: #084fb6; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .brand-logo { width: 36px; height: 36px; background: #ffffff; color: #0a58ca; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+        .brand-text h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+        .brand-text span { font-size: 11px; opacity: 0.6; display: block; margin-top: 2px; }
+        
+        .session-badge { margin: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .session-avatar { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+        .session-info p { font-size: 10px; opacity: 0.5; text-transform: uppercase; font-weight: bold; line-height: 1; margin-bottom: 4px; }
+        .session-info h4 { font-size: 13px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .sidebar-menu { flex-grow: 1; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
+        .menu-item.active { background: rgba(255,255,255,0.15); color: #ffffff; font-weight: 600; box-shadow: inset 3px 0 0 #ffffff; }
+        
+        .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-signout { display: block; width: 100%; text-align: center; background: #ef4444; color: #ffffff; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: background 0.2s; box-shadow: 0 2px 4px rgba(239,68,68,0.2); }
+        .btn-signout:hover { background: #dc2626; }
+
+        /* 💻 MAIN RUNTIME PLATFORM SHELL */
+        .app-body { flex-grow: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; }
+        .app-header { height: 70px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); z-index: 90; }
+        .search-box { display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 10px; width: 350px; }
+        .search-box input { border: none; background: transparent; outline: none; font-size: 13px; color: #334155; width: 100%; }
+        
+        .header-profile { display: flex; align-items: center; gap: 12px; }
+        .profile-meta { text-align: right; }
+        .profile-meta h4 { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .profile-meta span { font-size: 11px; background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 4px; font-weight: 600; border: 1px solid #dbeafe; display: inline-block; margin-top: 2px; }
+
+        .app-content { padding: 32px; flex-grow: 1; }
+        
+        /* 🔔 ALERT TOAST MESSAGES */
+        .alert-banner { padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+        .alert-close { background: none; border: none; font-size: 18px; cursor: pointer; color: inherit; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-<div class="d-flex">
-    <!-- Dynamic Sidebar -->
-    <div class="sidebar d-flex flex-column">
-        <div class="navbar-brand-custom text-white">
-            <i class="bi bi-bank2 me-2"></i>LWABASWA SMS
+    <!-- 1. NAVIGATION CONTROL DRAWER PANEL -->
+    <aside class="app-sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">🎓</div>
+            <div class="brand-text">
+                <h1>LWABASWA</h1>
+                <span>E.M.S.T SYSTEM</span>
+            </div>
         </div>
-        <div class="p-3 border-bottom border-secondary text-muted small">
-            Logged in as: <strong class="text-white">{{ request.session.user_role }}</strong>
-        </div>
-        <div class="flex-grow-1 mt-2">
-            <!-- Global Home Directives -->
-            <a href="/headteacher/" class="{% if request.path == '/headteacher/' %}active{% endif %}"><i class="bi bi-speedometer2 me-2"></i>Headteacher Panel</a>
-            <a href="{% url 'dos_dashboard' %}" class="{% if '/dos/' in request.path %}active{% endif %}"><i class="bi bi-journal-bookmark me-2"></i>DOS Academic Desk</a>
-            <a href="{% url 'teacher_dashboard' %}" class="{% if '/teacher/' in request.path %}active{% endif %}"><i class="bi bi-people me-2"></i>Teacher Classrooms</a>
-            <a href="{% url 'bursar_dashboard' %}" class="{% if '/bursar/' in request.path %}active{% endif %}"><i class="bi bi-cash-coin me-2"></i>Bursar Accounts</a>
-            <a href="{% url 'nurse_dashboard' %}" class="{% if '/nurse/' in request.path %}active{% endif %}"><i class="bi bi-heart-pulse me-2"></i>Nurse Sickbay</a>
-        </div>
-        <div class="p-3">
-            <a href="/logout/" class="btn btn-danger w-100 text-white text-center py-2"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
-        </div>
-    </div>
 
-    <!-- Right Side Dashboard Display Block -->
-    <div class="flex-grow-1 d-flex flex-column">
-        <header class="navbar navbar-expand navbar-light bg-white shadow-sm px-4 py-3">
-            <h4 class="m-0 text-secondary">{{ title|default:"Management Overview" }}</h4>
+        <div class="session-badge">
+            <div class="session-avatar">{{ request.session.user_role|slice:":1" }}</div>
+            <div class="session-info">
+                <p>Active Profile</p>
+                <h4>{{ request.session.full_name|default:request.session.username }}</h4>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <!-- 🏢 HEADTEACHER Master Views -->
+            {% if request.session.user_role == 'HEADTEACHER' %}
+                <a href="/headteacher/" class="menu-item {% if '/headteacher/' in request.path %}active{% endif %}">🏢 Headteacher Panel</a>
+                <a href="{% url 'dos_dashboard' %}" class="menu-item {% if '/dos/' in request.path %}active{% endif %}">📖 DOS Academic Desk</a>
+                <a href="{% url 'teacher_dashboard' %}" class="menu-item {% if '/teacher/' in request.path %}active{% endif %}">🧑‍🏫 Teacher Classrooms</a>
+                <a href="{% url 'bursar_dashboard' %}" class="menu-item {% if '/bursar-workspace/' in request.path %}active{% endif %}">💰 Bursar Finance Desk</a>
+                <a href="{% url 'nurse_dashboard' %}" class="menu-item {% if '/nurse-workspace/' in request.path %}active{% endif %}">🩺 Nurse Sickbay</a>
+            
+            <!-- 📖 DOS Core Views -->
+            {% elif request.session.user_role == 'DOS' %}
+                <a href="{% url 'dos_dashboard' %}" class="menu-item {% if '/dos/' in request.path %}active{% endif %}">📖 DOS Academic Desk</a>
+                <a href="{% url 'teacher_dashboard' %}" class="menu-item {% if '/teacher/' in request.path %}active{% endif %}">🧑‍🏫 Academic Roster</a>
+            
+            <!-- 🧑‍🏫 TEACHER Grading Views -->
+            {% elif request.session.user_role == 'TEACHER' %}
+                <a href="{% url 'teacher_dashboard' %}" class="menu-item {% if '/teacher/' in request.path %}active{% endif %}">🧑‍🏫 Teacher Classrooms</a>
+            
+            <!-- 💰 BURSAR Ledger Views -->
+            {% elif request.session.user_role == 'BURSAR' %}
+                <a href="{% url 'bursar_dashboard' %}" class="menu-item {% if '/bursar-workspace/' in request.path %}active{% endif %}">💰 Bursar Finance Desk</a>
+            
+            <!-- 🩺 NURSE Clinical Logs -->
+            {% elif request.session.user_role == 'NURSE' %}
+                <a href="{% url 'nurse_dashboard' %}" class="menu-item {% if '/nurse-workspace/' in request.path %}active{% endif %}">🩺 Nurse Sickbay</a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/logout/" class="btn-signout">Sign Out Safely</a>
+        </div>
+    </aside>
+
+    <!-- 2. CENTRAL WORKSPACE DISPLAY HUB -->
+    <div class="app-body">
+        <header class="app-header">
+            <div class="search-box">
+                <input type="text" placeholder="Search roster files, marks registers, collections...">
+            </div>
+            
+            <div class="header-profile">
+                <div class="profile-meta">
+                    <h4>{{ request.session.full_name }}</h4>
+                    <span>{{ request.session.user_role }}</span>
+                </div>
+            </div>
         </header>
 
-        <main class="container-fluid p-4 flex-grow-1">
+        <main class="app-content">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert-banner {% if 'success' in message.tags %}alert-success{% else %}alert-error{% endif %}">
+                            <span>{{ message }}</span>
+                            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% block content %}
-            <!-- Content injections load here natively -->
+            <!-- Inner application panels load here -->
             {% endblock content %}
         </main>
     </div>
-</div>
 
-<script src="https://jsdelivr.net"></script>
 </body>
 </html>
