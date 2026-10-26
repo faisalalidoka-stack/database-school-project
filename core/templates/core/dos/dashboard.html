@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Metric Overview Cards -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
+            <div>
+                <h6 class="text-muted small uppercase mb-1">Total Monitored Students</h6>
+                <h2 class="m-0 fw-bold text-primary">{{ total_students }}</h2>
+            </div>
+            <div class="bg-primary-subtle text-primary rounded p-3">
+                <i class="bi bi-people-fill fs-3"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
+            <div>
+                <h6 class="text-muted small uppercase mb-1">Active Curriculum Subjects</h6>
+                <h2 class="m-0 fw-bold text-info">{{ subjects.count }}</h2>
+            </div>
+            <div class="bg-info-subtle text-info rounded p-3">
+                <i class="bi bi-book-half fs-3"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Active Class Streams Structure -->
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-grid-3x3-gap text-secondary me-2"></i>Class Stream Configurations
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Stream ID</th>
+                            <th>Class Name</th>
+                            <th>Assigned Class Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cls in classes %}
+                            <tr>
+                                <td class="font-monospace text-muted">#{{ cls.class_id }}</td>
+                                <td class="fw-bold text-dark">{{ cls.class_name }}</td>
+                                <td>
+                                    {% if cls.class_teacher %}
+                                        <span class="text-success"><i class="bi bi-person-check me-1"></i>{{ cls.class_teacher.full_name }}</span>
+                                    {% else %}
+                                        <span class="text-danger small fw-semibold"><i class="bi bi-x-circle me-1"></i>Unassigned</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted p-4">No active class streams found in your MySQL schemas.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects Matrix Quick-View -->
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-bookmark-star text-warning me-2"></i>Subject Syllabus Blueprint
+            </h5>
+            <ul class="list-group list-group-flush">
+                {% for sub in subjects %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <span class="fw-medium text-dark">{{ sub.subject_name }}</span>
+                        <span class="badge bg-secondary-subtle text-secondary font-monospace">Stream ref: #{{ sub.class_field_id }}</span>
+                    </li>
+                {% empty %}
+                    <p class="text-muted small p-2">No subjects declared in database curriculum listings.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock content %}

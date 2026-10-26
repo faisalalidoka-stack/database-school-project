@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card border-0 shadow-sm p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h3 class="text-dark m-0">Record Classroom Assessment Marks</h3>
+            <p class="text-muted m-0">Stream: <strong>{{ target_class.class_name }}</strong></p>
+        </div>
+        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3 mb-4 p-3 bg-light rounded">
+            <div class="col-md-4">
+                <label class="form-label small text-muted fw-bold">1. Select Subject Course</label>
+                <select name="subject" class="form-select" required>
+                    <option value="" disabled selected>Choose target course...</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.subject_id }}">{{ subject.subject_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-muted fw-bold">2. Select Target Term Cycle</label>
+                <select name="term" class="form-select" required>
+                    <option value="" disabled selected>Choose cycle...</option>
+                    {% for term in terms %}
+                        <option value="{{ term.term_id }}">{{ term.term_name }} ({{ term.academic_year }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small text-muted fw-bold">3. Set Maximum Recordable Score</label>
+                <input type="number" name="max_score" class="form-control" value="100" min="1" step="1" required>
+            </div>
+        </div>
+
+        <h5 class="text-secondary mb-3">Student Enrollment Roster</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border-top">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 15%">Admission No.</th>
+                        <th style="width: 50%">Full Name</th>
+                        <th style="width: 15%">Gender</th>
+                        <th style="width: 20%">Assigned Score Entry</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td class="font-monospace text-secondary fw-bold">#{{ student.admission_no }}</td>
+                            <td class="text-dark fw-medium">{{ student.full_name }}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">{{ student.get_gender_display|default:student.gender }}</span>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="score_{{ student.student_id }}" class="form-control text-center fw-bold text-primary" placeholder="--" min="0" max="100" step="0.5">
+                                    <span class="input-group-text bg-light text-muted">pts</span>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted p-4">No students currently enrolled inside this class stream.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end mt-4 border-top pt-3">
+            <button type="submit" class="btn btn-primary px-4 py-2">
+                <i class="bi bi-cloud-check me-2"></i>Save Classroom Assessment Records
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

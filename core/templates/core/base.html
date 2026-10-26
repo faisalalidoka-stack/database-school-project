@@ -3,70 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lwabaswa School MS{% endblock %}</title>
+    <title>{{ title|default:"School Management System" }}</title>
+    <!-- Modern Bootstrap 5 Layout Interface -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <link rel="stylesheet" href="https://jsdelivr.net">
     <style>
-        /* Modern Self-Contained Offline Styles */
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-        .navbar { background-color: #0f172a; padding: 16px 24px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .navbar-brand { font-weight: 700; font-size: 1.25rem; text-decoration: none; color: white; display: flex; align-items: center; gap: 8px; }
-        .container { max-width: 1140px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; }
-        
-        /* Modern Alert Banners */
-        .alert { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 0.95rem; }
-        .alert-danger { background-color: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; }
-        .alert-success { background-color: #d1fae5; border-left: 4px solid #10b981; color: #065f46; }
-
-        /* Shared Dashboard & Panel Layout Styles */
-        .banner { background: white; padding: 28px; border-radius: 12px; border-left: 5px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .banner h2 { margin: 0 0 6px 0; font-size: 1.6rem; font-weight: 700; color: #0f172a; }
-        .badge { background: #d1fae5; color: #065f46; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
-        .badge-info { background: #e0f2fe; color: #0369a1; text-transform: uppercase; }
-        
-        .row { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 30px; }
-        .col-md-3 { flex: 1; min-width: 240px; }
-        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid #3b82f6; box-sizing: border-box; }
-        .card-info { border-top-color: #0ea5e9; }
-        .card-warning { border-top-color: #f59e0b; }
-        .card-success { border-top-color: #10b981; }
-        .card small { text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: #64748b; letter-spacing: 0.05em; }
-        .card h3 { margin: 12px 0 0 0; font-size: 2.2rem; font-weight: 800; }
-        
-        .card-action { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box; }
-        .card-action h5 { margin: 0 0 20px 0; font-size: 1.15rem; font-weight: 700; color: #0f172a; }
-        
-        /* Modern Buttons and Controllers */
-        .btn-group { display: flex; flex-wrap: wrap; gap: 12px; }
-        .btn { padding: 10px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 0.9rem; display: inline-block; transition: all 0.2s; border: none; cursor: pointer; text-align: center; }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-warning { background: #d97706; color: white; }
-        .btn-warning:hover { background: #b45309; }
-        .btn-dark { background: #475569; color: white; }
-        .btn-dark:hover { background: #334155; }
-        .btn-danger { background: #dc2626; color: white; font-size: 0.85rem; padding: 6px 14px; }
-        .btn-danger:hover { background: #b91c1c; }
-        
-        /* Form Inputs Uniformity */
-        .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; color: #1e293b; background-color: #fff; transition: border-color 0.2s; }
-        .form-control:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        .form-label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: #334155; }
+        body { background-color: #f4f6f9; min-height: 100vh; display: flex; flex-direction: column; }
+        .sidebar { background: #1e293b; color: #fff; min-width: 260px; max-width: 260px; min-height: 100vh; }
+        .sidebar a { color: #cbd5e1; text-decoration: none; padding: 12px 20px; display: block; transition: all 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background: #334155; color: #fff; border-left: 4px solid #3b82f6; }
+        .navbar-brand-custom { font-size: 1.25rem; font-weight: bold; background: #0f172a; padding: 20px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <a class="navbar-brand" href="/dashboard/">🇺🇬 Lwabaswa School MS</a>
-        <div>
-            {% if request.session.user_id %}
-                <span style="margin-right: 16px; font-size: 0.95rem;">👤 <strong>{{ request.session.full_name }}</strong> (<span class="badge badge-info">{{ request.session.role }}</span>)</span>
-                <a class="btn btn-danger" href="/logout/">Sign Out</a>
-            {% endif %}
+<div class="d-flex">
+    <!-- Dynamic Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <div class="navbar-brand-custom text-white">
+            <i class="bi bi-bank2 me-2"></i>LWABASWA SMS
+        </div>
+        <div class="p-3 border-bottom border-secondary text-muted small">
+            Logged in as: <strong class="text-white">{{ request.session.user_role }}</strong>
+        </div>
+        <div class="flex-grow-1 mt-2">
+            <!-- Global Home Directives -->
+            <a href="/headteacher/" class="{% if request.path == '/headteacher/' %}active{% endif %}"><i class="bi bi-speedometer2 me-2"></i>Headteacher Panel</a>
+            <a href="{% url 'dos_dashboard' %}" class="{% if '/dos/' in request.path %}active{% endif %}"><i class="bi bi-journal-bookmark me-2"></i>DOS Academic Desk</a>
+            <a href="{% url 'teacher_dashboard' %}" class="{% if '/teacher/' in request.path %}active{% endif %}"><i class="bi bi-people me-2"></i>Teacher Classrooms</a>
+            <a href="{% url 'bursar_dashboard' %}" class="{% if '/bursar/' in request.path %}active{% endif %}"><i class="bi bi-cash-coin me-2"></i>Bursar Accounts</a>
+            <a href="{% url 'nurse_dashboard' %}" class="{% if '/nurse/' in request.path %}active{% endif %}"><i class="bi bi-heart-pulse me-2"></i>Nurse Sickbay</a>
+        </div>
+        <div class="p-3">
+            <a href="/logout/" class="btn btn-danger w-100 text-white text-center py-2"><i class="bi bi-box-arrow-left me-2"></i>Logout</a>
         </div>
     </div>
 
-    <div class="container">
-        {% block content %}{% endblock %}
-    </div>
+    <!-- Right Side Dashboard Display Block -->
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="navbar navbar-expand navbar-light bg-white shadow-sm px-4 py-3">
+            <h4 class="m-0 text-secondary">{{ title|default:"Management Overview" }}</h4>
+        </header>
 
+        <main class="container-fluid p-4 flex-grow-1">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            <!-- Content injections load here natively -->
+            {% endblock content %}
+        </main>
+    </div>
+</div>
+
+<script src="https://jsdelivr.net"></script>
 </body>
 </html>

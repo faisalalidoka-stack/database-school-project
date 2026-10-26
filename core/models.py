@@ -1,12 +1,5 @@
-﻿# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
-
+﻿from django.db import models
+from django.contrib.auth.models import User
 
 class Classes(models.Model):
     class_id = models.AutoField(primary_key=True)
@@ -48,7 +41,7 @@ class FeePayments(models.Model):
 
 class FeeStructure(models.Model):
     fee_structure_id = models.AutoField(primary_key=True)
-    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word.
+    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')
     term = models.ForeignKey('Terms', models.DO_NOTHING)
     amount_required = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -99,17 +92,20 @@ class Students(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     guardian_name = models.CharField(max_length=100, blank=True, null=True)
     guardian_contact = models.CharField(max_length=30, blank=True, null=True)
-    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word.
+    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')
 
     class Meta:
         managed = False
         db_table = 'students'
 
+    def __str__(self):
+        return self.full_name
+
 
 class Subjects(models.Model):
     subject_id = models.AutoField(primary_key=True)
     subject_name = models.CharField(max_length=80)
-    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word.
+    class_field = models.ForeignKey(Classes, models.DO_NOTHING, db_column='class_id')
 
     class Meta:
         managed = False
@@ -128,15 +124,35 @@ class Terms(models.Model):
         db_table = 'terms'
         unique_together = (('term_name', 'academic_year'),)
 
+    def __str__(self):
+        return f"{self.term_name} ({self.academic_year})"
+
 
 class Users(models.Model):
     user_id = models.AutoField(primary_key=True)
     full_name = models.CharField(max_length=100)
     username = models.CharField(unique=True, max_length=50)
     password_hash = models.CharField(max_length=255)
-    role = models.CharField(max_length=30)
+    role = models.CharField(max_length=30)  # Values: 'HEADTEACHER', 'TEACHER', 'DOS', 'BURSAR', 'NURSE'
     is_active = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'users'
+
+    def __str__(self):
+        return f"{self.full_name} ({self.role})"
+
+
+class MedicalLogs(models.Model):
+    log_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(Students, models.DO_NOTHING, db_column='student_id')
+    term = models.ForeignKey(Terms, models.DO_NOTHING, db_column='term_id')
+    symptoms = models.TextField()
+    treatment_given = models.TextField()
+    visit_date = models.DateTimeField(auto_now_add=True)
+    logged_by = models.ForeignKey(Users, models.DO_NOTHING, db_column='user_id')
+
+    class Meta:
+        managed = True  # Instructs Django to physically create this missing table in your MySQL DB
+        db_table = 'medical_logs'

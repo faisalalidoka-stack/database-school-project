@@ -1,0 +1,85 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Log Sickbay Visit Form -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-heart-pulse-fill text-danger me-2"></i>New Sickbay Admission
+            </h5>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small text-muted fw-bold">Patient Student</label>
+                    <select name="student" class="form-select" required>
+                        <option value="" disabled selected>Search patient name...</option>
+                        {% for std in students %}
+                            <option value="{{ std.student_id }}">{{ std.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-muted fw-bold">Current Term</label>
+                    <select name="term" class="form-select" required>
+                        <option value="" disabled selected>Select term...</option>
+                        {% for term in terms %}
+                            <option value="{{ term.term_id }}">{{ term.term_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small text-muted fw-bold">Observed Symptoms / Illness</label>
+                    <textarea name="symptoms" class="form-control" rows="3" placeholder="e.g. Complaining of severe headache and high body temperature." required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small text-muted fw-bold">Treatment / Medication Administered</label>
+                    <textarea name="treatment_given" class="form-control" rows="3" placeholder="e.g. Administered 2 tabs of Paracetamol and assigned 2 hours bed rest." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 py-2">
+                    <i class="bi bi-plus-circle me-2"></i>Save Incident Card
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Treatment Logs Feed -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <h5 class="text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-journal-medical text-primary me-2"></i>Daily Sickbay Incident Logs
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date / Time</th>
+                            <th>Student Patient</th>
+                            <th>Presented Symptoms</th>
+                            <th>Treatment Rendered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in medical_records %}
+                            <tr>
+                                <td class="small text-muted font-monospace">{{ log.visit_date|date:"d M, H:i" }}</td>
+                                <td class="fw-bold text-dark">{{ log.student.full_name }}</td>
+                                <td class="small text-secondary">{{ log.symptoms }}</td>
+                                <td class="small"><span class="badge bg-success-subtle text-success border border-success-subtle">{{ log.treatment_given }}</span></td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted p-4">No sickbay incidents filed inside the database.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
