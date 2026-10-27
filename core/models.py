@@ -156,3 +156,47 @@ class MedicalLogs(models.Model):
     class Meta:
         managed = True  # Instructs Django to physically create this missing table in your MySQL DB
         db_table = 'medical_logs'
+# =========================================================================
+# 🆕 HEADTEACHER SPEC EXTRA DATA SCHEMAS (Managed = True)
+# =========================================================================
+
+class AuditLog(models.Model):
+    log_id = models.AutoField(primary_key=True)
+    performed_by = models.ForeignKey('Users', models.DO_NOTHING, db_column='user_id')
+    action_type = models.CharField(max_length=50) # e.g., 'ELIGIBILITY_OVERRIDE', 'STAFF_RESET'
+    description = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = True
+        db_table = 'audit_log'
+
+
+class FeeWaivers(models.Model):
+    waiver_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey('Students', models.DO_NOTHING, db_column='student_id')
+    term = models.ForeignKey('Terms', models.DO_NOTHING, db_column='term_id')
+    amount_requested = models.DecimalField(max_digits=10, decimal_places=2)
+    reason = models.TextField()
+    status = models.CharField(max_length=20, default='PENDING') # 'PENDING', 'APPROVED', 'REJECTED'
+    reviewed_by = models.ForeignKey('Users', models.DO_NOTHING, db_column='reviewed_by', null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = True
+        db_table = 'fee_waivers'
+
+
+# Since ReportCards is an auto-generated unmanaged table from your schema, 
+# we create a specialized Approval status extension table to track Headteacher flags 
+# without altering your raw 'report_cards' structural layout directly.
+class ReportCardApprovals(models.Model):
+    approval_id = models.AutoField(primary_key=True)
+    report = models.ForeignKey('ReportCards', models.DO_NOTHING, db_column='report_id')
+    status = models.CharField(max_length=20, default='PENDING') # 'PENDING', 'APPROVED', 'BLOCKED'
+    headteacher_remark = models.TextField(blank=True, null=True)
+    reviewed_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = True
+        db_table = 'report_card_approvals'

@@ -1,88 +1,100 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="row g-4 mb-4">
-    <!-- Metric Overview Cards -->
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
-            <div>
-                <h6 class="text-muted small uppercase mb-1">Total Monitored Students</h6>
-                <h2 class="m-0 fw-bold text-primary">{{ total_students }}</h2>
-            </div>
-            <div class="bg-primary-subtle text-primary rounded p-3">
-                <i class="bi bi-people-fill fs-3"></i>
-            </div>
-        </div>
+<style>
+    .dos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .dos-card { background: #ffffff; padding: 24px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+    .dos-details h6 { font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .dos-details h2 { font-size: 28px; font-weight: 700; color: #1e293b; }
+    .dos-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    
+    .layout-splitter { display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 32px; }
+    .panel-card { background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+    .panel-title { font-size: 15px; font-weight: 700; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+    
+    .dos-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px; }
+    .dos-table th { padding: 12px; background: #f8fafc; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+    .dos-table td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    
+    .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    .status-assigned { background: #f0fdf4; color: #16a34a; }
+    .status-vacant { background: #fef2f2; color: #dc2626; }
+    
+    .syllabus-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; }
+    .syllabus-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .stream-tag { font-family: monospace; font-size: 11px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+</style>
+
+<!-- 📊 METRICS OVERVIEW CARDS -->
+<div class="dos-grid">
+    <div class="dos-card">
+        <div class="dos-details"><h6>Total Monitored Students</h6><h2>{{ total_students }}</h2></div>
+        <div class="dos-icon" style="background: #eff6ff; color: #2563eb;">👥</div>
     </div>
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm p-3 bg-white text-dark d-flex flex-row align-items-center justify-content-between">
-            <div>
-                <h6 class="text-muted small uppercase mb-1">Active Curriculum Subjects</h6>
-                <h2 class="m-0 fw-bold text-info">{{ subjects.count }}</h2>
-            </div>
-            <div class="bg-info-subtle text-info rounded p-3">
-                <i class="bi bi-book-half fs-3"></i>
-            </div>
-        </div>
+    <div class="dos-card">
+        <div class="dos-details"><h6>Active Curriculum Subjects</h6><h2>{{ subjects.count }}</h2></div>
+        <div class="dos-icon" style="background: #e0f2fe; color: #0284c7;">📚</div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Active Class Streams Structure -->
-    <div class="col-md-7">
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="text-dark border-bottom pb-2 mb-3">
-                <i class="bi bi-grid-3x3-gap text-secondary me-2"></i>Class Stream Configurations
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+<!-- 🆕 ADDED FEATURE 2: TERMINAL AUTOMATED REPORT CARDS COMPILER PANEL -->
+<div class="panel-card" style="background: linear-gradient(90deg, #f8fafc 0%, #eff6ff 100%);">
+    <div class="panel-title" style="color: #1e3a8a;">⚡ Automated Student Report Card Compiler</div>
+    <p style="font-size: 13px; color: #475569; margin-bottom: 16px;">Select an active term cycle below to execute bulk compilation. The processing engine will automatically aggregate total marks scores, calculate terminal percentage averages, allocate school letter grades, and compile teacher remark cards across the board.</p>
+    <form method="POST" action="" style="display: flex; gap: 12px; align-items: center;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="compile_reports">
+        <select name="term_id" style="padding: 10px; border-radius: 8px; border: 1px solid #bbe1fa; outline: none; background: #ffffff; font-size: 13.5px;" required>
+            <option value="" disabled selected>-- Choose Target Assessment Term --</option>
+            {% for term in terms %}
+                <option value="{{ term.term_id }}">{{ term.term_name }} ({{ term.academic_year }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="background: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer;">Compile Term Reports</button>
+    </form>
+</div>
+
+<!-- 🗂️ GRID SPLITTER -->
+<div class="layout-splitter">
+    <div class="panel-card">
+        <div class="panel-title">🪟 Class Stream Configurations</div>
+        <div style="overflow-x: auto;">
+            <table class="dos-table">
+                <thead>
+                    <tr>
+                        <th>Stream ID</th>
+                        <th>Class Name</th>
+                        <th>Assigned Class Teacher</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cls in classes %}
                         <tr>
-                            <th>Stream ID</th>
-                            <th>Class Name</th>
-                            <th>Assigned Class Teacher</th>
+                            <td style="font-family: monospace; color: #94a3b8; font-weight: bold;">#{{ cls.class_id }}</td>
+                            <td style="font-weight: 600;">{{ cls.class_name }}</td>
+                            <td>
+                                {% if cls.class_teacher %}
+                                    <span class="status-badge status-assigned">✔️ {{ cls.class_teacher.full_name }}</span>
+                                {% else %}
+                                    <span class="status-badge status-vacant">❌ Unassigned</span>
+                                {% endif %}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for cls in classes %}
-                            <tr>
-                                <td class="font-monospace text-muted">#{{ cls.class_id }}</td>
-                                <td class="fw-bold text-dark">{{ cls.class_name }}</td>
-                                <td>
-                                    {% if cls.class_teacher %}
-                                        <span class="text-success"><i class="bi bi-person-check me-1"></i>{{ cls.class_teacher.full_name }}</span>
-                                    {% else %}
-                                        <span class="text-danger small fw-semibold"><i class="bi bi-x-circle me-1"></i>Unassigned</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted p-4">No active class streams found in your MySQL schemas.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Subjects Matrix Quick-View -->
-    <div class="col-md-5">
-        <div class="card border-0 shadow-sm p-4">
-            <h5 class="text-dark border-bottom pb-2 mb-3">
-                <i class="bi bi-bookmark-star text-warning me-2"></i>Subject Syllabus Blueprint
-            </h5>
-            <ul class="list-group list-group-flush">
-                {% for sub in subjects %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                        <span class="fw-medium text-dark">{{ sub.subject_name }}</span>
-                        <span class="badge bg-secondary-subtle text-secondary font-monospace">Stream ref: #{{ sub.class_field_id }}</span>
-                    </li>
-                {% empty %}
-                    <p class="text-muted small p-2">No subjects declared in database curriculum listings.</p>
-                {% endfor %}
-            </ul>
+    <div class="panel-card">
+        <div class="panel-title">📑 Subject Syllabus Blueprint</div>
+        <div class="syllabus-list">
+            {% for sub in subjects %}
+                <div class="syllabus-item">
+                    <span style="font-weight: 600;">📘 {{ sub.subject_name }}</span>
+                    <span class="stream-tag">Class ref: #{{ sub.class_field_id }}</span>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

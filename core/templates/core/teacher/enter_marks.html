@@ -1,83 +1,77 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="card border-0 shadow-sm p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-        <div>
-            <h3 class="text-dark m-0">Record Classroom Assessment Marks</h3>
-            <p class="text-muted m-0">Stream: <strong>{{ target_class.class_name }}</strong></p>
-        </div>
-        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
-        </a>
-    </div>
+<style>
+    .form-card { background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+    .form-title { font-size: 16px; font-weight: 700; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 20px; }
+    .config-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; background: #f8fafc; padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+    .config-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+    .input-sm { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13.5px; outline: none; background: #ffffff; }
+    .input-sm:focus { border-color: #2563eb; }
+    .grid-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px; }
+    .grid-table th { padding: 12px; background: #f8fafc; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+    .grid-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    .score-field { width: 90px; padding: 6px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #2563eb; outline: none; }
+    .score-field:focus { border-color: #2563eb; background: #eff6ff; }
+</style>
 
+<div class="form-card">
+    <div class="form-title">📝 Record Classroom Assessment Marks (Stream: {{ target_class.class_name }})</div>
     <form method="POST">
         {% csrf_token %}
-        <div class="row g-3 mb-4 p-3 bg-light rounded">
-            <div class="col-md-4">
-                <label class="form-label small text-muted fw-bold">1. Select Subject Course</label>
-                <select name="subject" class="form-select" required>
-                    <option value="" disabled selected>Choose target course...</option>
+        <div class="config-row">
+            <div class="config-group">
+                <label>1. Select Course Subject</label>
+                <select name="subject" class="input-sm" required>
+                    <option value="" disabled selected>Choose course...</option>
                     {% for subject in subjects %}
                         <option value="{{ subject.subject_id }}">{{ subject.subject_name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label small text-muted fw-bold">2. Select Target Term Cycle</label>
-                <select name="term" class="form-select" required>
+            <div class="config-group">
+                <label>2. Academic Term Cycle</label>
+                <select name="term" class="input-sm" required>
                     <option value="" disabled selected>Choose cycle...</option>
                     {% for term in terms %}
                         <option value="{{ term.term_id }}">{{ term.term_name }} ({{ term.academic_year }})</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label small text-muted fw-bold">3. Set Maximum Recordable Score</label>
-                <input type="number" name="max_score" class="form-control" value="100" min="1" step="1" required>
+            <div class="config-group">
+                <label>3. Max Evaluation Points</label>
+                <input type="number" name="max_score" class="input-sm" value="100" min="1" required>
             </div>
         </div>
 
-        <h5 class="text-secondary mb-3">Student Enrollment Roster</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle border-top">
-                <thead class="table-light">
+        <table class="grid-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Admission No.</th>
+                    <th style="width: 50%;">Full Student Name</th>
+                    <th style="width: 25%;">Assigned Assessment Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
                     <tr>
-                        <th style="width: 15%">Admission No.</th>
-                        <th style="width: 50%">Full Name</th>
-                        <th style="width: 15%">Gender</th>
-                        <th style="width: 20%">Assigned Score Entry</th>
+                        <td style="font-family: monospace; font-weight: bold; color: #64748b;">#{{ student.admission_no }}</td>
+                        <td style="font-weight: 600;">{{ student.full_name }}</td>
+                        <td>
+                            <input type="number" name="score_{{ student.student_id }}" class="score-field" placeholder="--" min="0" max="100" step="0.5">
+                            <span style="font-size: 12px; color: #94a3b8; margin-left: 4px;">/ 100</span>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                        <tr>
-                            <td class="font-monospace text-secondary fw-bold">#{{ student.admission_no }}</td>
-                            <td class="text-dark fw-medium">{{ student.full_name }}</td>
-                            <td>
-                                <span class="badge bg-light text-dark border">{{ student.get_gender_display|default:student.gender }}</span>
-                            </td>
-                            <td>
-                                <div class="input-group input-group-sm">
-                                    <input type="number" name="score_{{ student.student_id }}" class="form-control text-center fw-bold text-primary" placeholder="--" min="0" max="100" step="0.5">
-                                    <span class="input-group-text bg-light text-muted">pts</span>
-                                </div>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted p-4">No students currently enrolled inside this class stream.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="text-end mt-4 border-top pt-3">
-            <button type="submit" class="btn btn-primary px-4 py-2">
-                <i class="bi bi-cloud-check me-2"></i>Save Classroom Assessment Records
-            </button>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #94a3b8; padding: 24px;">No students registered in this stream.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="text-align: right; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+            <button type="submit" style="background: #2563eb; color: #ffffff; padding: 10px 24px; border-radius: 8px; font-size: 13.5px; font-weight: 600; border: none; cursor: pointer;">Save Class Marks Register</button>
         </div>
     </form>
 </div>
